@@ -1,0 +1,14 @@
+.mainDetail {
+    width: 80%;
+    margin: auto;
+    display: flex;
+
+    .applyDetails {
+        flex-basis: 30%;
+        border: 1px solid black;
+    }
+    .mainDetails {
+        flex-basis: 70%;
+        border: 1px solid black;
+    }
+}
