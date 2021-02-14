@@ -14,6 +14,8 @@ import PublicIcon from '@material-ui/icons/Public';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import JobList from './Jobs/JobList';
+import {useState, useEffect} from 'react';
+
 const CssButton = withStyles({
   root: {
     background: '#1E86FF',
@@ -49,14 +51,57 @@ const CssInputSide = withStyles({
 })(Input);
 
 function App() {
-  const [fullTime, setFullTime] = React.useState(true);
-  const handleFullTimeChange =() =>{
-    setFullTime(!fullTime);
+  const [description, setDescription] = React.useState('');
+  const [fullTime, setFullTime] = React.useState(false);
+  const [predefined, setPredefined] = React.useState('');
+  const [location, setLocation] = React.useState('');
+  const [jobList,setJobList] = useState([]);
+  const [count, setCount] = useState(0);
+  const handleDescriptionChange=(value)=>{
+    setDescription(value);
+  }
+  const handlePredefined =(value) => {
+   setPredefined(value)
   }
 
-  const handlePredefined =() => {
-
+  const handleFullTimeChange =(value)=>{
+    setFullTime(value);
   }
+
+  const handleLocation = (value) => {
+    setLocation(value);
+  }
+  const handleSearch = ()=>{
+    const loc = location ==''? predefined : location; 
+    const url = loc== ''? `https://thingproxy.freeboard.io/fetch/https://jobs.github.com/positions.json?description=${description}&full_time=${fullTime}`:
+    `https://thingproxy.freeboard.io/fetch/https://jobs.github.com/positions.json?description=${description}&full_time=${fullTime}&location=${loc}`;
+
+    fetch(url, {
+      "method": "GET"
+    })
+      .then(response => response.json())
+      .then(response => {
+        setJobList(response);
+        setCount(response.length/5);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
+
+  useEffect(() => {
+    fetch(`https://thingproxy.freeboard.io/fetch/https://jobs.github.com/positions.json`, {
+      "method": "GET"
+    })
+      .then(response => response.json())
+      .then(response => {
+        setJobList(response);
+        setCount(response.length/5);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }, []);
   return (
     <>
     <div className={styles.mainContainer}>
@@ -65,25 +110,26 @@ function App() {
       </div>
       <div className={styles.tbContainer}>
       <CssInput disableUnderline={true}  autoComplete="off" placeholder="Title, companies, expertise or benefits"
+          onChange={(e)=>handleDescriptionChange(e.target.value)}
           id="input-with-icon-adornment"
           startAdornment={
             <InputAdornment position="start">
               <WorkOutlineIcon />
             </InputAdornment>
           } />
-       <CssButton>Search</CssButton>   
+       <CssButton onClick={()=>handleSearch()}>Search</CssButton>   
       </div>
      </div>
      <div className={styles.centerContainer}>
        <div className={styles.selectionContainer}>
        <FormControlLabel
-        control={<Checkbox checked={fullTime} color="primary" onChange={()=>handleFullTimeChange()} name="fullTime" />}
+        control={<Checkbox checked={fullTime} color="primary" onChange={(e)=>handleFullTimeChange(e.target.checked)} name="fullTime" />}
         label="Full Time"
       />
       <FormControl>
        <CssInputLabel htmlFor="location">location</CssInputLabel>
        <CssInputSide disableUnderline={true}  autoComplete="off" placeholder="City,state,zip code or country"
-          id="location"
+          id="location" onChange={(e)=> handleLocation(e.target.value)}
           startAdornment={
             <InputAdornment position="start">
               <PublicIcon />
@@ -91,7 +137,7 @@ function App() {
           } />
        </FormControl>
          <FormControl component="fieldset">
-           <RadioGroup  name="predefinedLoc"  onChange={()=>handlePredefined()}>
+           <RadioGroup  name="predefinedLoc"  onChange={(e)=>handlePredefined(e.target.value)}>
             <FormControlLabel value="London" control={<Radio color="primary"/>} label="London" />
             <FormControlLabel value="Amsterdam" control={<Radio color="primary"/>} label="Amsterdam" />
             <FormControlLabel value="New York" control={<Radio color="primary"/>} label="New York" />
@@ -100,7 +146,7 @@ function App() {
          </FormControl>   
        </div>
        <div className={styles.jobListContainer}>
-        <JobList/>
+        <JobList jobList={jobList} count={count}/>
        </div>
       </div>
     </>

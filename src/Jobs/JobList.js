@@ -6,16 +6,24 @@ import Typography from '@material-ui/core/Typography';
 import styles from './JobList.module.scss';
 import PublicIcon from '@material-ui/icons/Public';
 import Button from '@material-ui/core/Button';
-import Divider from '@material-ui/core/Divider';
+import Pagination from '@material-ui/lab/Pagination';
+import {useState} from 'react';
 
-
-function JobList() {
+function JobList(props) {
+  
+  const [page, setPage] = useState(1);
+  const [pageStartEnd, setPageStartEnd] = useState({ start: 0, end: 5 });
  
+  const handlePageChange =(event,value)=>{
+      setPage(value);
+      setPageStartEnd({ start: (value - 1) * 5, end: value * 5 - 1});
+  }
+   
 return(
     <>
-    {jobList.map((data,key) => {
+    {props.jobList.slice(pageStartEnd.start, pageStartEnd.end).map((data,key) => {
          return (
-            <Card className={styles.mainCard}>
+            <Card className={styles.mainCard} key={key}>
               <CardMedia className={styles.imgContainer} image={data.company_logo}>
               </CardMedia>
               <CardContent className={styles.contentContainer}>
@@ -30,12 +38,11 @@ return(
                 <span><PublicIcon /> {data.location} </span>
                </div>
               </CardContent>
-              <Divider  />
             </Card>
          )
       })
     } 
-    <Pagination count={10} variant="outlined" shape="rounded" page={page} onChange={handleChange} />
+    <Pagination count={props.count} variant="outlined" shape="rounded" page={page} onChange={handlePageChange} />
     </>  
 )
 }
