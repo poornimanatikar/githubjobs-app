@@ -7,9 +7,10 @@ import PublicIcon from '@material-ui/icons/Public';
 import Button from '@material-ui/core/Button';
 import Pagination from '@material-ui/lab/Pagination';
 import {useState} from 'react';
-
+import { useHistory } from "react-router-dom";
+import AccessTimeIcon from '@material-ui/icons/AccessTime';
 function JobList(props) {
-  
+  let history = useHistory();
   const [page, setPage] = useState(1);
   const [pageStartEnd, setPageStartEnd] = useState({ start: 0, end: 5 });
  
@@ -17,12 +18,26 @@ function JobList(props) {
       setPage(value);
       setPageStartEnd({ start: (value - 1) * 5, end: value * 5 - 1});
   }
+
+  const handleCardClick = (value) => {
+    history.push(`/${value}`);
+  }
    
+  const getDate = (value) => {
+    let date_posted = new Date(value);
+    let current = new Date();
+    let diff = Math.ceil(Math.abs(current - date_posted)/(1000*60*60*24));
+    if(diff === 1) {
+      return `${diff} day ago`;
+    } else {
+      return `${diff} days ago`;
+    }
+   }
 return(
     <>
     {props.jobList.slice(pageStartEnd.start, pageStartEnd.end).map((data,key) => {
          return (
-            <Card className={styles.mainCard} key={key}>
+            <Card className={styles.mainCard} key={key} onClick={() => handleCardClick(data.id)}>
               <CardMedia className={styles.imgContainer} image={data.company_logo}>
               </CardMedia>
               <CardContent className={styles.contentContainer}>
@@ -34,7 +49,8 @@ return(
               </Typography>
               <div className={styles.cardFooter}>
                 <Button variant="outlined">{data.type}</Button>                
-                <span><PublicIcon /> {data.location} </span>
+                <span className={styles.publicIcon}><PublicIcon /> {data.location} </span>
+                <span className={styles.accessIcon}><AccessTimeIcon /> {getDate(data.created_at)}</span>
                </div>
               </CardContent>
             </Card>

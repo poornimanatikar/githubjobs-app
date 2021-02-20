@@ -3,6 +3,7 @@
     flex-direction: row;
     width: 100%;
     margin-bottom: 5%;
+    cursor: pointer;
     .imgContainer {
         flex-basis: 30%;
         background-size: 100% 100%;
@@ -15,6 +16,13 @@
         justify-content: flex-end;
         :first-child {
             margin-right: auto;
+        }
+
+        .publicIcon,
+        .accessIcon {
+            display: inline-flex;
+            margin-top: 10px;
+            margin-left: 10px;
         }
     }
 }

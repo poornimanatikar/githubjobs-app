@@ -16,7 +16,7 @@ function App() {
          <h1>Github Jobs</h1>
        </div>
        <Switch>
-          <Route path="/detail">
+          <Route path="/:id">
             <Details />
           </Route>
           <Route path="/">
